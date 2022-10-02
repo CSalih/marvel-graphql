@@ -1,36 +1,11 @@
 extend schema @link(
     url: "https://specs.apollo.dev/federation/v2.0",
-    import: ["@key", "@shareable", "@provides", "@external"]
+    import: ["@key", "@shareable"]
 )
 
 type Query {
     character(id: ID!): CharactersResponse!
     characters: CharactersResponse!
-}
-
-interface QueryResponse {
-    "The HTTP status code of the returned result"
-    code: Int
-    "A string description of the call status"
-    status: String
-    "The copyright notice for the returned result"
-    copyright: String
-    """
-    The attribution notice for this result. Please display either this notice
-    or the contents of the attributionHTML field on all screens which contain
-    data from the Marvel Comics API
-    """
-    attributionText: String
-    """
-    An HTML representation of the attribution notice for this result.
-    Please display either this notice or the contents of the attributionText
-    field on all screens which contain data from the Marvel Comics API
-    """
-    attributionHTML: String
-    "A digest value of the content returned by the call"
-    etag: String
-    "The results returned by the call"
-    data: CharacterDataContainer
 }
 
 type CharactersResponse implements QueryResponse {
@@ -58,19 +33,6 @@ type CharactersResponse implements QueryResponse {
     data: CharacterDataContainer
 }
 
-interface DataContainer {
-    "The requested offset (number of skipped results) of the call"
-    offset: Int
-    "The requested result limit"
-    limit: Int
-    "The total number of resources available given the current filter set"
-    total: Int
-    "The total number of results returned by this call"
-    count: Int
-    "The list of characters returned by the call"
-    results: [BaseEntity]
-}
-
 type CharacterDataContainer implements DataContainer {
     "The requested offset (number of skipped results) of the call"
     offset: Int
@@ -84,16 +46,11 @@ type CharacterDataContainer implements DataContainer {
     results: [Character]
 }
 
-interface BaseEntity {
-    "The unique ID of the resource"
-    id: ID!
-    "The path to the individual entity resource"
-    resourceURI: String!
-}
-
 type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     "The unique ID of the character resource"
     id: ID!
+    "The canonical URL identifier for this resource"
+    resourceURI: String!
     "The name of the character"
     name: String
     "The url path of to the image related to the character"
@@ -102,8 +59,6 @@ type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceUR
     description: String
     "The date the resource was most recently modified"
     modified: String
-    "The canonical URL identifier for this resource"
-    resourceURI: String!
     "A set of public web site URLs for the resource"
     urls: [Url!]
     "Lists of comics filtered by a character id"
@@ -116,19 +71,51 @@ type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceUR
     stories: StoryList!
 }
 
-type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+### Shared types
+
+interface QueryResponse {
+    "The HTTP status code of the returned result"
+    code: Int
+    "A string description of the call status"
+    status: String
+    "The copyright notice for the returned result"
+    copyright: String
+    """
+    The attribution notice for this result. Please display either this notice
+    or the contents of the attributionHTML field on all screens which contain
+    data from the Marvel Comics API
+    """
+    attributionText: String
+    """
+    An HTML representation of the attribution notice for this result.
+    Please display either this notice or the contents of the attributionText
+    field on all screens which contain data from the Marvel Comics API
+    """
+    attributionHTML: String
+    "A digest value of the content returned by the call"
+    etag: String
+    "The results returned by the call"
+    data: DataContainer
+}
+
+interface DataContainer {
+    "The requested offset (number of skipped results) of the call"
+    offset: Int
+    "The requested result limit"
+    limit: Int
+    "The total number of resources available given the current filter set"
+    total: Int
+    "The total number of results returned by this call"
+    count: Int
+    "The list of entities returned by the call"
+    results: [BaseEntity]
+}
+
+interface BaseEntity {
+    "The unique ID of the resource"
     id: ID!
     "The path to the individual entity resource"
     resourceURI: String!
-    "The name of the comic"
-    name: String @external
-}
-
-type Url @shareable {
-    "A text identifier for the URL"
-    type: String
-    "A full URL (including scheme, domain, and path)"
-    url: String
 }
 
 interface List {
@@ -142,18 +129,22 @@ interface List {
     items: [BaseEntity!]
 }
 
-type ComicList implements List {
-    "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
-    available: Int
-    "The number of issues returned in this collection (up to 20)"
-    returned: Int
-    "The path to the full list of issues in this collection"
-    collectionURI: String
-    "The list of returned issues in this collection"
-    items: [Comic!] @provides(fields: "name")
+type Url @shareable {
+    "A text identifier for the URL"
+    type: String
+    "A full URL (including scheme, domain, and path)"
+    url: String
 }
 
-type SeriesList implements List {
+### Comic
+
+type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    id: ID!
+    "The path to the individual entity resource"
+    resourceURI: String!
+}
+
+type ComicList implements List @shareable {
     "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
     available: Int
     "The number of issues returned in this collection (up to 20)"
@@ -161,8 +152,29 @@ type SeriesList implements List {
     "The path to the full list of issues in this collection"
     collectionURI: String
     "The list of returned issues in this collection"
-    items: [SeriesSummary!]
+    items: [Comic!]
 }
+
+### Series
+
+type SeriesList implements List @shareable {
+    "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
+    available: Int
+    "The number of issues returned in this collection (up to 20)"
+    returned: Int
+    "The path to the full list of issues in this collection"
+    collectionURI: String
+    "The list of returned issues in this collection"
+    items: [Series!]
+}
+
+type Series implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    id: ID!
+    "The path to the individual entity resource"
+    resourceURI: String!
+}
+
+### Event
 
 type EventList implements List {
     "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
@@ -175,6 +187,17 @@ type EventList implements List {
     items: [EventSummary!]
 }
 
+type EventSummary implements BaseEntity {
+    "The unique ID of the character resource"
+    id: ID!
+    "The path to the individual entity resource"
+    resourceURI: String!
+    "The canonical name of the entity"
+    name: String
+}
+
+### Story
+
 type StoryList implements List {
     "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
     available: Int
@@ -184,25 +207,6 @@ type StoryList implements List {
     collectionURI: String
     "The list of returned issues in this collection"
     items: [StorySummary!]
-}
-
-
-type SeriesSummary implements BaseEntity {
-    "The unique ID of the character resource"
-    id: ID!
-    "The path to the individual entity resource"
-    resourceURI: String!
-    "The canonical name of the entity"
-    name: String
-}
-
-type EventSummary implements BaseEntity {
-    "The unique ID of the character resource"
-    id: ID!
-    "The path to the individual entity resource"
-    resourceURI: String!
-    "The canonical name of the entity"
-    name: String
 }
 
 type StorySummary implements BaseEntity {
