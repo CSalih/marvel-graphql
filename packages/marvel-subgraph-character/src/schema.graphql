@@ -1,3 +1,7 @@
+extend schema @link(
+    url: "https://specs.apollo.dev/federation/v2.0",
+    import: ["@key", "@shareable", "@provides", "@external"]
+)
 
 type Query {
     character(id: ID!): CharactersResponse!
@@ -64,7 +68,7 @@ interface DataContainer {
     "The total number of results returned by this call"
     count: Int
     "The list of characters returned by the call"
-    results: [ResultData]
+    results: [BaseEntity]
 }
 
 type CharacterDataContainer implements DataContainer {
@@ -80,12 +84,14 @@ type CharacterDataContainer implements DataContainer {
     results: [Character]
 }
 
-interface ResultData {
-    "The unique ID of the character resource"
+interface BaseEntity {
+    "The unique ID of the resource"
     id: ID!
+    "The path to the individual entity resource"
+    resourceURI: String!
 }
 
-type Character implements ResultData  {
+type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     "The unique ID of the character resource"
     id: ID!
     "The name of the character"
@@ -97,7 +103,7 @@ type Character implements ResultData  {
     "The date the resource was most recently modified"
     modified: String
     "The canonical URL identifier for this resource"
-    resourceURI: String
+    resourceURI: String!
     "A set of public web site URLs for the resource"
     urls: [Url!]
     "Lists of comics filtered by a character id"
@@ -110,7 +116,15 @@ type Character implements ResultData  {
     stories: StoryList!
 }
 
-type Url {
+type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    id: ID!
+    "The path to the individual entity resource"
+    resourceURI: String!
+    "The name of the comic"
+    name: String @external
+}
+
+type Url @shareable {
     "A text identifier for the URL"
     type: String
     "A full URL (including scheme, domain, and path)"
@@ -125,7 +139,7 @@ interface List {
     "The path to the full list of issues in this collection"
     collectionURI: String
     "The list of returned issues in this collection"
-    items: [Summary!]
+    items: [BaseEntity!]
 }
 
 type ComicList implements List {
@@ -136,7 +150,7 @@ type ComicList implements List {
     "The path to the full list of issues in this collection"
     collectionURI: String
     "The list of returned issues in this collection"
-    items: [ComicSummary!]
+    items: [Comic!] @provides(fields: "name")
 }
 
 type SeriesList implements List {
@@ -161,7 +175,6 @@ type EventList implements List {
     items: [EventSummary!]
 }
 
-
 type StoryList implements List {
     "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
     available: Int
@@ -174,37 +187,29 @@ type StoryList implements List {
 }
 
 
-interface Summary {
+type SeriesSummary implements BaseEntity {
+    "The unique ID of the character resource"
+    id: ID!
     "The path to the individual entity resource"
-    resourceURI: String
+    resourceURI: String!
     "The canonical name of the entity"
     name: String
 }
 
-type ComicSummary implements Summary {
+type EventSummary implements BaseEntity {
+    "The unique ID of the character resource"
+    id: ID!
     "The path to the individual entity resource"
-    resourceURI: String
+    resourceURI: String!
     "The canonical name of the entity"
     name: String
 }
 
-type SeriesSummary implements Summary {
+type StorySummary implements BaseEntity {
+    "The unique ID of the character resource"
+    id: ID!
     "The path to the individual entity resource"
-    resourceURI: String
-    "The canonical name of the entity"
-    name: String
-}
-
-type EventSummary implements Summary {
-    "The path to the individual entity resource"
-    resourceURI: String
-    "The canonical name of the entity"
-    name: String
-}
-
-type StorySummary implements Summary {
-    "The path to the individual entity resource"
-    resourceURI: String
+    resourceURI: String!
     "The canonical name of the entity"
     name: String
     "The type of the entity"

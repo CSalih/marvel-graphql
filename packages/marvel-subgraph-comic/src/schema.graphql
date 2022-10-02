@@ -1,3 +1,4 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable"])
 
 type Query {
     comic(id: ID!): ComicsResponse!
@@ -48,8 +49,8 @@ interface DataContainer {
     total: Int
     "The total number of results returned by this call"
     count: Int
-    "The list of characters returned by the call"
-    results: [ResultData]
+    "The list of entities returned by the call"
+    results: [BaseEntity]
 }
 
 type ComicDataContainer implements DataContainer {
@@ -65,14 +66,18 @@ type ComicDataContainer implements DataContainer {
     results: [Comic]
 }
 
-interface ResultData {
-    "The unique ID of the character resource"
+interface BaseEntity {
+    "The unique ID of the resource"
     id: ID!
+    "The path to the individual entity resource"
+    resourceURI: String!
 }
 
-type Comic implements ResultData  {
+type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     "The unique ID of the character resource"
     id: ID!
+    "The name of the comic"
+    name: String @shareable
     "The ID of the digital comic representation of this comic. Will be 0 if the comic is not available digitally"
     digitalId: Int
     "The canonical title of the comic"
@@ -100,9 +105,11 @@ type Comic implements ResultData  {
     "A set of descriptive text blurbs for the comic"
     textObjects: [TextObject!]
     "The canonical URL identifier for this resource"
-    resourceURI: String
+    resourceURI: String!
     "A set of public web site URLs for the resource"
     urls: [Url!]
+    "A list of characters to this comic"
+    characters: [Character!]
 #    "A list of series (Summary Types) to this comic"
 #    series: Summary
 #    "A list of variant issues for this comic (includes the 'original' issue if the current issue is a variant)"
@@ -122,7 +129,7 @@ type Comic implements ResultData  {
 }
 
 
-type Url {
+type Url @shareable {
     "A text identifier for the URL"
     type: String
     "A full URL (including scheme, domain, and path)"
@@ -160,3 +167,9 @@ type ComicPrice {
 }
 
 ### Character
+
+type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    id: ID!
+    "The canonical URL identifier for this resource"
+    resourceURI: String!
+}
