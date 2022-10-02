@@ -34,5 +34,15 @@ export const resolvers = {
         items
       }
     },
+    creators: async (series) => {
+      const items = series.creators.items.map((creator) => ({
+        ...creator,
+        id: creator.resourceURI.split("/").pop()
+      }));
+      return {
+        ...series.creators,
+        items,
+      }
+    },
   },
 };

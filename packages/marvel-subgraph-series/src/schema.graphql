@@ -52,6 +52,10 @@ type Series implements BaseEntity @key(fields: "id") @key(fields: "resourceURI")
     modified: String
     "The representative image for this series"
     thumbnail: Image
+    "A summary representation of the series which follows this series"
+    next: Series
+    "A summary representation of the series which preceded this series"
+    previous: Series
     "A resource list containing comics in this series"
     comics: ComicList
 #    "A resource list containing stories which occur in comics in this series"
@@ -60,12 +64,8 @@ type Series implements BaseEntity @key(fields: "id") @key(fields: "resourceURI")
 #    events: EventList
     "A resource list containing characters which appear in comics in this series"
     characters: CharacterList
-#    "A resource list of creators whose work appears in comics in this series"
-#    creators: CreatorList
-    "A summary representation of the series which follows this series"
-    next: Series
-    "A summary representation of the series which preceded this series"
-    previous: Series
+    "A resource list of creators whose work appears in comics in this series"
+    creators: CreatorList
 }
 
 ### Shared types
@@ -175,5 +175,24 @@ type CharacterList implements List @shareable {
 type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     id: ID!
     "The canonical URL identifier for this resource"
+    resourceURI: String!
+}
+
+### Creator
+
+type CreatorList implements List @shareable {
+    "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
+    available: Int
+    "The number of issues returned in this collection (up to 20)"
+    returned: Int
+    "The path to the full list of issues in this collection"
+    collectionURI: String
+    "The list of returned issues in this collection"
+    items: [Creator!]
+}
+
+type Creator implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    id: ID!
+    "The path to the individual entity resource"
     resourceURI: String!
 }

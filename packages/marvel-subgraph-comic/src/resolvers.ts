@@ -30,5 +30,15 @@ export const resolvers = {
         items,
       }
     },
+    creators: async (comic) => {
+      const items = comic.creators.items.map((creator) => ({
+        ...creator,
+        id: creator.resourceURI.split("/").pop()
+      }));
+      return {
+        ...comic.creators,
+        items,
+      }
+    },
   }
 };

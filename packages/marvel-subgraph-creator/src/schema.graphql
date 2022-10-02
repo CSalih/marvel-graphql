@@ -4,21 +4,21 @@ extend schema @link(
 )
 
 type Query {
-    comic(id: ID!): ComicsResponse!
-    comics: ComicsResponse!
+    creatorById(id: ID!): CreatorResponse!
+    creators: CreatorResponse!
 }
 
-type ComicsResponse implements QueryResponse {
+type CreatorResponse implements QueryResponse {
     code: Int
     status: String
     copyright: String
     attributionText: String
     attributionHTML: String
     etag: String
-    data: ComicDataContainer
+    data: CreatorDataContainer
 }
 
-type ComicDataContainer implements DataContainer {
+type CreatorDataContainer implements DataContainer {
     "The requested offset (number of skipped results) of the call"
     offset: Int
     "The requested result limit"
@@ -28,85 +28,38 @@ type ComicDataContainer implements DataContainer {
     "The total number of results returned by this call"
     count: Int
     "The list of characters returned by the call"
-    results: [Comic]
+    results: [Creator]
 }
 
-type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
-    "The unique ID of the character resource"
+type Creator implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    "The unique ID of the series resource"
     id: ID!
     "The canonical URL identifier for this resource"
     resourceURI: String!
-    "The ID of the digital comic representation of this comic. Will be 0 if the comic is not available digitally"
-    digitalId: Int
-    "The canonical title of the comic"
-    title: String
-    "The number of the issue in the series (will generally be 0 for collection formats)"
-    issueNumber: Int
-    "If the issue is a variant (e.g. an alternate cover, second printing, or director’s cut), a text description of the variant"
-    variantDescription: String
-    "The preferred description of the comic"
-    description: String
-    "The date the resource was most recently modified"
-    modified: String
-    "The ISBN for the comic (generally only populated for collection formats)"
-    isbn: String
-    "The UPC barcode number for the comic (generally only populated for periodical formats)"
-    upc: String
-    "The Diamond code for the comic"
-    diamondCode: String
-    "The EAN barcode for the comic"
-    ean: String
-    "The ISSN barcode for the comic"
-    issn: String
-    "The publication format of the comic e.g. comic, hardcover, trade paperback"
-    format: String
-    "A set of descriptive text blurbs for the comic"
-    textObjects: [TextObject!]
+    "The first name of the creator"
+    firstName: String
+    "The middle name of the creator"
+    middleName: String
+    "The last name of the creator"
+    lastName: String
+    "The suffix or honorific for the creator"
+    suffix: String
+    "The full name of the creator (a space-separated concatenation of the above four fields)"
+    fullName: String
     "A set of public web site URLs for the resource"
     urls: [Url!]
-#    "A list of variant issues for this comic (includes the 'original' issue if the current issue is a variant)"
-#    variants: [Summary!]
-#    "A list of collections which include this comic (will generally be empty if the comic's format is a collection)"
-#    collections: [Summary!]
-#    "A list of issues collected in this comic (will generally be empty for periodical formats such as 'comic' or 'magazine')"
-#    collectedIssues: [Summary!]
-    "A list of key dates for this comic"
-    dates: [ComicDate!]
-    "A list of prices for this comic"
-    prices: [ComicPrice!]
-    "The url path of to the image related to the comic"
-    thumbnail: String
-    "A list of promotional images associated with this comic"
-    images: [Image!]
-    "A list of characters to this comic"
-    characters: [Character!]
-    "A list of series (Summary Types) to this comic"
-    series: SeriesList!
-    "A resource list containing the creators associated with this comic"
-    creators: CreatorList!
-}
-
-type TextObject {
-    "The canonical type of the text object (e.g. solicit text, preview text, etc.)"
-    type: String
-    "The IETF language tag denoting the language the text object is written in"
-    language: String
-    "The text"
-    text: String
-}
-
-type ComicDate {
-    "A description of the date (e.g. onsale date, FOC date)"
-    type: String
-    "The date"
-    date: String
-}
-
-type ComicPrice {
-    "A description of the price (e.g. print price, digital price"
-    type: String
-    "The price of the comic resource"
-    price: Int
+    "The date the resource was most recently modified"
+    modified: String
+    "The representative image for this creator"
+    thumbnail: Image
+    "A resource list containing the comics which feature work by this creator"
+    comics: ComicList
+#    "A resource list containing the stories which feature work by this creator"
+#    stories: StoryList
+#    "A resource list containing the events which feature work by this creator"
+#    events: EventList
+    "A resource list containing the series which feature work by this creator"
+    series: SeriesList
 }
 
 ### Shared types
@@ -181,7 +134,37 @@ type Image @shareable {
     extension: String
 }
 
+### Comic
+
+type ComicList implements List @shareable {
+    "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
+    available: Int
+    "The number of issues returned in this collection (up to 20)"
+    returned: Int
+    "The path to the full list of issues in this collection"
+    collectionURI: String
+    "The list of returned issues in this collection"
+    items: [Comic!]
+}
+
+type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    id: ID!
+    "The canonical URL identifier for this resource"
+    resourceURI: String!
+}
+
 ### Character
+
+type CharacterList implements List @shareable {
+    "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
+    available: Int
+    "The number of issues returned in this collection (up to 20)"
+    returned: Int
+    "The path to the full list of issues in this collection"
+    collectionURI: String
+    "The list of returned issues in this collection"
+    items: [Character!]
+}
 
 type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     id: ID!
@@ -203,25 +186,6 @@ type SeriesList implements List @shareable {
 }
 
 type Series implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
-    id: ID!
-    "The path to the individual entity resource"
-    resourceURI: String!
-}
-
-### Creator
-
-type CreatorList implements List @shareable {
-    "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
-    available: Int
-    "The number of issues returned in this collection (up to 20)"
-    returned: Int
-    "The path to the full list of issues in this collection"
-    collectionURI: String
-    "The list of returned issues in this collection"
-    items: [Creator!]
-}
-
-type Creator implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     id: ID!
     "The path to the individual entity resource"
     resourceURI: String!
