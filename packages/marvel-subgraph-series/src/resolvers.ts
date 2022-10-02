@@ -44,5 +44,15 @@ export const resolvers = {
         items,
       }
     },
+    events: async (series) => {
+      const items = series.events.items.map((event) => ({
+        ...event,
+        id: event.resourceURI.split("/").pop()
+      }));
+      return {
+        ...series.events,
+        items,
+      }
+    },
   },
 };

@@ -4,36 +4,21 @@ extend schema @link(
 )
 
 type Query {
-    character(id: ID!): CharactersResponse!
-    characters: CharactersResponse!
+    eventById(id: ID!): EventResponse!
+    events: EventResponse!
 }
 
-type CharactersResponse implements QueryResponse {
-    "The HTTP status code of the returned result"
+type EventResponse implements QueryResponse {
     code: Int
-    "A string description of the call status"
     status: String
-    "The copyright notice for the returned result"
     copyright: String
-    """
-    The attribution notice for this result. Please display either this notice
-    or the contents of the attributionHTML field on all screens which contain
-    data from the Marvel Comics API
-    """
     attributionText: String
-    """
-    An HTML representation of the attribution notice for this result.
-    Please display either this notice or the contents of the attributionText
-    field on all screens which contain data from the Marvel Comics API
-    """
     attributionHTML: String
-    "A digest value of the content returned by the call"
     etag: String
-    "The results returned by the call"
-    data: CharacterDataContainer
+    data: EventDataContainer
 }
 
-type CharacterDataContainer implements DataContainer {
+type EventDataContainer implements DataContainer {
     "The requested offset (number of skipped results) of the call"
     offset: Int
     "The requested result limit"
@@ -43,33 +28,45 @@ type CharacterDataContainer implements DataContainer {
     "The total number of results returned by this call"
     count: Int
     "The list of characters returned by the call"
-    results: [Character]
+    results: [Event]
 }
 
-type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
-    "The unique ID of the character resource"
+
+type Event implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    "The unique ID of the event resource"
     id: ID!
     "The canonical URL identifier for this resource"
     resourceURI: String!
-    "The name of the character"
-    name: String
-    "The url path of to the image related to the character"
-    thumbnail: String
-    "A short bio or description of the character"
+    "The title of the event"
+    title: String
+    "A description of the event"
     description: String
-    "The date the resource was most recently modified"
-    modified: String
     "A set of public web site URLs for the resource"
     urls: [Url!]
-    "Lists of comics filtered by a character id"
-    comics: ComicList!
-    "Lists of series filtered by a character id"
-    series: SeriesList!
-    "Lists of events filtered by a character id"
-    events: EventList!
-    "Lists of stories filtered by a character id"
-    stories: StoryList!
+    "The date of publication of the first issue in this event"
+    start: String
+    "The date of publication of the last issue in this event"
+    end: String
+    "The date the resource was most recently modified"
+    modified: String
+    "The representative image for this event"
+    thumbnail: Image
+    "A summary representation of the event which follows this event"
+    next: Series
+    "A summary representation of the series which preceded this series"
+    previous: Series
+    "A resource list containing the comics in this event"
+    comics: ComicList
+    #    "A resource list containing the stories in this event"
+    #    stories: StoryList
+    "A resource list containing the series in this event"
+    series: SeriesList
+    "A resource list containing the characters which appear in this event"
+    characters: CharacterList
+    "A resource list containing creators whose work appears in this event"
+    creators: CreatorList
 }
+
 
 ### Shared types
 
@@ -136,13 +133,14 @@ type Url @shareable {
     url: String
 }
 
-### Comic
-
-type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
-    id: ID!
-    "The path to the individual entity resource"
-    resourceURI: String!
+type Image @shareable {
+    "A file path to the resources image"
+    path: String
+    "The file extension for the resource image"
+    extension: String
 }
+
+### Comic
 
 type ComicList implements List @shareable {
     "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
@@ -153,6 +151,12 @@ type ComicList implements List @shareable {
     collectionURI: String
     "The list of returned issues in this collection"
     items: [Comic!]
+}
+
+type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    id: ID!
+    "The canonical URL identifier for this resource"
+    resourceURI: String!
 }
 
 ### Series
@@ -174,9 +178,9 @@ type Series implements BaseEntity @key(fields: "id") @key(fields: "resourceURI")
     resourceURI: String!
 }
 
-### Event
+### Character
 
-type EventList implements List @shareable {
+type CharacterList implements List @shareable {
     "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
     available: Int
     "The number of issues returned in this collection (up to 20)"
@@ -184,18 +188,18 @@ type EventList implements List @shareable {
     "The path to the full list of issues in this collection"
     collectionURI: String
     "The list of returned issues in this collection"
-    items: [Event!]
+    items: [Character!]
 }
 
-type Event implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+type Character implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     id: ID!
-    "The path to the individual entity resource"
+    "The canonical URL identifier for this resource"
     resourceURI: String!
 }
 
-### Story
+### Creator
 
-type StoryList implements List {
+type CreatorList implements List @shareable {
     "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
     available: Int
     "The number of issues returned in this collection (up to 20)"
@@ -203,16 +207,11 @@ type StoryList implements List {
     "The path to the full list of issues in this collection"
     collectionURI: String
     "The list of returned issues in this collection"
-    items: [StorySummary!]
+    items: [Creator!]
 }
 
-type StorySummary implements BaseEntity {
-    "The unique ID of the character resource"
+type Creator implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     id: ID!
     "The path to the individual entity resource"
     resourceURI: String!
-    "The canonical name of the entity"
-    name: String
-    "The type of the entity"
-    type: String
 }

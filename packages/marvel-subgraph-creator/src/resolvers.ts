@@ -44,5 +44,15 @@ export const resolvers = {
         items,
       }
     },
+    events: async (creator) => {
+      const items = creator.events.items.map((event) => ({
+        ...event,
+        id: event.resourceURI.split("/").pop()
+      }));
+      return {
+        ...creator.events,
+        items,
+      }
+    },
   },
 };

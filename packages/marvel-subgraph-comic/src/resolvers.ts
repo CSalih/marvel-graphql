@@ -40,5 +40,15 @@ export const resolvers = {
         items,
       }
     },
+    events: async (comic) => {
+      const items = comic.events.items.map((event) => ({
+        ...event,
+        id: event.resourceURI.split("/").pop()
+      }));
+      return {
+        ...comic.events,
+        items,
+      }
+    },
   }
 };

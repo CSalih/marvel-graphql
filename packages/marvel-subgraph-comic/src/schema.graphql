@@ -84,6 +84,8 @@ type Comic implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") 
     series: SeriesList!
     "A resource list containing the creators associated with this comic"
     creators: CreatorList!
+    "A resource list containing the events in which this comic appears"
+    events: EventList!
 }
 
 type TextObject {
@@ -222,6 +224,25 @@ type CreatorList implements List @shareable {
 }
 
 type Creator implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
+    id: ID!
+    "The path to the individual entity resource"
+    resourceURI: String!
+}
+
+### Event
+
+type EventList implements List @shareable {
+    "The number of total available issues in this list. Will always be greater than or equal to the 'returned' value"
+    available: Int
+    "The number of issues returned in this collection (up to 20)"
+    returned: Int
+    "The path to the full list of issues in this collection"
+    collectionURI: String
+    "The list of returned issues in this collection"
+    items: [Event!]
+}
+
+type Event implements BaseEntity @key(fields: "id") @key(fields: "resourceURI") {
     id: ID!
     "The path to the individual entity resource"
     resourceURI: String!
