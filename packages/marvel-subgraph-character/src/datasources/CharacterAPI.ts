@@ -9,11 +9,11 @@ export class CharacterAPI extends RESTDataSource {
   }
 
   characters() {
-    return CharactersResponse; //this.get("characters");
+    return CharactersResponse;
   }
 
   characterById( characterId: number ) {
-    const result = CharactersResponse.data.results.find(character => character.id == characterId );
+    const result = CharactersResponse.data.results.find(character => character.id === characterId );
     return {
       ...CharactersResponse,
       data: {
@@ -23,7 +23,6 @@ export class CharacterAPI extends RESTDataSource {
         results: [result]
       }
     }
-    // return this.get(`characters/${characterId}`);
   }
 }
 

@@ -4,12 +4,17 @@ export const resolvers = {
       return dataSources.characterAPI.characters();
     },
     character:  async (_, { id }, {dataSources}) => {
-      return dataSources.characterAPI.characterById(id);
+      return dataSources.characterAPI.characterById(
+        Number.parseInt(id)
+      );
     },
   },
   Character: {
     __resolveReference: async ({id}, {dataSources}) => {
-      const res = await dataSources.characterAPI.characterById(id);
+      console.log("Character.__resolveReference", id)
+      const res = await dataSources.characterAPI.characterById(
+        Number.parseInt(id)
+      );
       return res.data.results[0] || null;
     },
     comics: async (character) => {
