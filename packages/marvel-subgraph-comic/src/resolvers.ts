@@ -19,6 +19,16 @@ export const resolvers = {
         const id = resourceURI.split("/").pop();
         return { id, name, resourceURI };
       })
-    }
+    },
+    series: async (comic) => {
+      const items = comic.series.items.map((comic) => ({
+        ...comic,
+        id: comic.resourceURI.split("/").pop()
+      }));
+      return {
+        ...comic.series,
+        items,
+      }
+    },
   }
 };

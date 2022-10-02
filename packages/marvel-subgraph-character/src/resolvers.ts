@@ -26,6 +26,16 @@ export const resolvers = {
         ...character.comics,
         items,
       }
-    }
+    },
+    series: async (character) => {
+      const items = character.series.items.map((comic) => ({
+        ...comic,
+        id: comic.resourceURI.split("/").pop()
+      }));
+      return {
+        ...character.series,
+        items,
+      }
+    },
   }
 };
