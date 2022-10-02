@@ -1,0 +1,22 @@
+{
+  "name": "marvel-subgraph-story",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon src/index.ts -e js,ts,graphql",
+    "subgraph:publish": "rover subgraph publish $APOLLO_GRAPH_REF --schema ./src/schema.graphql --name story --routing-url=http://localhost:4005"
+  },
+  "dependencies": {
+    "@apollo/subgraph": "^2.1.3",
+    "apollo-datasource-rest": "^3.7.0",
+    "apollo-server": "^3.10.2",
+    "graphql": "^16.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.23",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  }
+}

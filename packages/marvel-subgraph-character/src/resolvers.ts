@@ -47,5 +47,15 @@ export const resolvers = {
         items,
       }
     },
+    stories: async ({stories}) => {
+      const items = stories.items.map((event) => ({
+        ...event,
+        id: event.resourceURI.split("/").pop()
+      }));
+      return {
+        ...stories,
+        items,
+      }
+    },
   }
 };
