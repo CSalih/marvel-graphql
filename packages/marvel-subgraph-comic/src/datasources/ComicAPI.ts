@@ -1,4 +1,4 @@
-import { RESTDataSource } from 'apollo-datasource-rest';
+import {RESTDataSource} from 'apollo-datasource-rest';
 
 const ComicResponse = require("./comics.json");
 
@@ -12,8 +12,8 @@ export class ComicAPI extends RESTDataSource {
     return ComicResponse;
   }
 
-  comicById( comicId: number ) {
-    const result = ComicResponse.data.results.find(result => result.id === comicId );
+  comicById(comicId: number) {
+    const result = ComicResponse.data.results.find(result => result.id === comicId);
     return {
       ...ComicResponse,
       data: {

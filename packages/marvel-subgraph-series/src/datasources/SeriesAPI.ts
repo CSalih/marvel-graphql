@@ -1,4 +1,4 @@
-import { RESTDataSource } from 'apollo-datasource-rest';
+import {RESTDataSource} from 'apollo-datasource-rest';
 
 const mockedResponse = require("./series.json");
 
@@ -12,8 +12,8 @@ export class SeriesAPI extends RESTDataSource {
     return mockedResponse;
   }
 
-  seriesById( seriesId: number ) {
-    const result = mockedResponse.data.results.find(result => result.id === seriesId );
+  seriesById(seriesId: number) {
+    const result = mockedResponse.data.results.find(result => result.id === seriesId);
     return {
       ...mockedResponse,
       data: {

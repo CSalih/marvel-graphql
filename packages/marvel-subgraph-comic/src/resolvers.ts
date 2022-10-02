@@ -3,7 +3,7 @@ export const resolvers = {
     comics: async (_, __, {dataSources}) => {
       return dataSources.comicAPI.comics();
     },
-    comic:  async (_, { id }, {dataSources}) => {
+    comic: async (_, {id}, {dataSources}) => {
       return dataSources.comicAPI.comicById(Number.parseInt(id));
     },
   },
@@ -15,9 +15,9 @@ export const resolvers = {
       return res.data.results[0] || null;
     },
     characters: async (comic) => {
-      return comic.characters.items.map(({ name, resourceURI }) => {
+      return comic.characters.items.map(({name, resourceURI}) => {
         const id = resourceURI.split("/").pop();
-        return { id, name, resourceURI };
+        return {id, name, resourceURI};
       })
     },
     series: async (comic) => {

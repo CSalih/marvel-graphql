@@ -3,7 +3,7 @@ export const resolvers = {
     creators: async (_, __, {dataSources}) => {
       return dataSources.creatorAPI.creators()
     },
-    creatorById:  async (_, { id }, {dataSources}) => {
+    creatorById: async (_, {id}, {dataSources}) => {
       return dataSources.creatorAPI.creatorById(Number.parseInt(id));
     },
   },
@@ -15,9 +15,9 @@ export const resolvers = {
       return res.data.results[0] || null;
     },
     characters: async (creator) => {
-      const items = creator.characters.items.map(({ name, resourceURI }) => {
+      const items = creator.characters.items.map(({name, resourceURI}) => {
         const id = resourceURI.split("/").pop();
-        return { id, name, resourceURI };
+        return {id, name, resourceURI};
       })
       return {
         ...creator.characters,
@@ -25,9 +25,9 @@ export const resolvers = {
       }
     },
     comics: async (creator) => {
-      const items = creator.comics.items.map(({ name, resourceURI }) => {
+      const items = creator.comics.items.map(({name, resourceURI}) => {
         const id = resourceURI.split("/").pop();
-        return { id, name, resourceURI };
+        return {id, name, resourceURI};
       })
       return {
         ...creator.comics,

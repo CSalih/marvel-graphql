@@ -3,7 +3,7 @@ export const resolvers = {
     characters: async (_, __, {dataSources}) => {
       return dataSources.characterAPI.characters();
     },
-    character:  async (_, { id }, {dataSources}) => {
+    character: async (_, {id}, {dataSources}) => {
       return dataSources.characterAPI.characterById(
         Number.parseInt(id)
       );

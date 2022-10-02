@@ -1,4 +1,4 @@
-import { RESTDataSource } from 'apollo-datasource-rest';
+import {RESTDataSource} from 'apollo-datasource-rest';
 
 const mockedResponse = require("./creators.json");
 
@@ -12,8 +12,8 @@ export class CreatorAPI extends RESTDataSource {
     return mockedResponse;
   }
 
-  creatorById( seriesId: number ) {
-    const result = mockedResponse.data.results.find(result => result.id === seriesId );
+  creatorById(seriesId: number) {
+    const result = mockedResponse.data.results.find(result => result.id === seriesId);
     return {
       ...mockedResponse,
       data: {

@@ -1,4 +1,4 @@
-import { RESTDataSource } from 'apollo-datasource-rest';
+import {RESTDataSource} from 'apollo-datasource-rest';
 
 const CharactersResponse = require("./characters.json");
 
@@ -12,8 +12,8 @@ export class CharacterAPI extends RESTDataSource {
     return CharactersResponse;
   }
 
-  characterById( characterId: number ) {
-    const result = CharactersResponse.data.results.find(character => character.id === characterId );
+  characterById(characterId: number) {
+    const result = CharactersResponse.data.results.find(character => character.id === characterId);
     return {
       ...CharactersResponse,
       data: {
