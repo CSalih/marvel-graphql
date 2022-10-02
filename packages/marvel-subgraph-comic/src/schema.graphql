@@ -1,0 +1,162 @@
+
+type Query {
+    comic(id: ID!): ComicsResponse!
+    comics: ComicsResponse!
+}
+
+interface QueryResponse {
+    "The HTTP status code of the returned result"
+    code: Int
+    "A string description of the call status"
+    status: String
+    "The copyright notice for the returned result"
+    copyright: String
+    """
+    The attribution notice for this result. Please display either this notice
+    or the contents of the attributionHTML field on all screens which contain
+    data from the Marvel Comics API
+    """
+    attributionText: String
+    """
+    An HTML representation of the attribution notice for this result.
+    Please display either this notice or the contents of the attributionText
+    field on all screens which contain data from the Marvel Comics API
+    """
+    attributionHTML: String
+    "A digest value of the content returned by the call"
+    etag: String
+    "The results returned by the call"
+    data: DataContainer
+}
+
+type ComicsResponse implements QueryResponse {
+    code: Int
+    status: String
+    copyright: String
+    attributionText: String
+    attributionHTML: String
+    etag: String
+    data: ComicDataContainer
+}
+
+interface DataContainer {
+    "The requested offset (number of skipped results) of the call"
+    offset: Int
+    "The requested result limit"
+    limit: Int
+    "The total number of resources available given the current filter set"
+    total: Int
+    "The total number of results returned by this call"
+    count: Int
+    "The list of characters returned by the call"
+    results: [ResultData]
+}
+
+type ComicDataContainer implements DataContainer {
+    "The requested offset (number of skipped results) of the call"
+    offset: Int
+    "The requested result limit"
+    limit: Int
+    "The total number of resources available given the current filter set"
+    total: Int
+    "The total number of results returned by this call"
+    count: Int
+    "The list of characters returned by the call"
+    results: [Comic]
+}
+
+interface ResultData {
+    "The unique ID of the character resource"
+    id: ID!
+}
+
+type Comic implements ResultData  {
+    "The unique ID of the character resource"
+    id: ID!
+    "The ID of the digital comic representation of this comic. Will be 0 if the comic is not available digitally"
+    digitalId: Int
+    "The canonical title of the comic"
+    title: String
+    "The number of the issue in the series (will generally be 0 for collection formats)"
+    issueNumber: Int
+    "If the issue is a variant (e.g. an alternate cover, second printing, or director’s cut), a text description of the variant"
+    variantDescription: String
+    "The preferred description of the comic"
+    description: String
+    "The date the resource was most recently modified"
+    modified: String
+    "The ISBN for the comic (generally only populated for collection formats)"
+    isbn: String
+    "The UPC barcode number for the comic (generally only populated for periodical formats)"
+    upc: String
+    "The Diamond code for the comic"
+    diamondCode: String
+    "The EAN barcode for the comic"
+    ean: String
+    "The ISSN barcode for the comic"
+    issn: String
+    "The publication format of the comic e.g. comic, hardcover, trade paperback"
+    format: String
+    "A set of descriptive text blurbs for the comic"
+    textObjects: [TextObject!]
+    "The canonical URL identifier for this resource"
+    resourceURI: String
+    "A set of public web site URLs for the resource"
+    urls: [Url!]
+#    "A list of series (Summary Types) to this comic"
+#    series: Summary
+#    "A list of variant issues for this comic (includes the 'original' issue if the current issue is a variant)"
+#    variants: [Summary!]
+#    "A list of collections which include this comic (will generally be empty if the comic's format is a collection)"
+#    collections: [Summary!]
+#    "A list of issues collected in this comic (will generally be empty for periodical formats such as 'comic' or 'magazine')"
+#    collectedIssues: [Summary!]
+    "A list of key dates for this comic"
+    dates: [ComicDate!]
+    "A list of prices for this comic"
+    prices: [ComicPrice!]
+    "The url path of to the image related to the comic"
+    thumbnail: String
+    "A list of promotional images associated with this comic"
+    images: [Image!]
+}
+
+
+type Url {
+    "A text identifier for the URL"
+    type: String
+    "A full URL (including scheme, domain, and path)"
+    url: String
+}
+
+type TextObject {
+    "The canonical type of the text object (e.g. solicit text, preview text, etc.)"
+    type: String
+    "The IETF language tag denoting the language the text object is written in"
+    language: String
+    "The text"
+    text: String
+}
+
+type Image {
+    "A file path to the resources image"
+    path: String
+    "The file extension for the resource image"
+    extension: String
+}
+
+type ComicDate {
+    "A description of the date (e.g. onsale date, FOC date)"
+    type: String
+    "The date"
+    date: String
+}
+
+type ComicPrice {
+    "A description of the price (e.g. print price, digital price"
+    type: String
+    "The price of the comic resource"
+    price: Int
+}
+
+### Character

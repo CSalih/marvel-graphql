@@ -1,0 +1,5 @@
+include_subgraph_errors:
+  all: true # Propagate errors from all subgraphs
+cors:
+  origins:
+    - https://studio.apollographql.com # Allows Apollo Studio to still run queries against your Router
